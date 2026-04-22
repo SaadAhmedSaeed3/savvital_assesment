@@ -1,0 +1,87 @@
+[
+  {
+    "input_data": {
+      "name": "Margaret Chen",
+      "age": 72,
+      "marital_status": "Married",
+      "has_children": true,
+      "owns_property": true,
+      "has_business": true
+    },
+    "prompt_sent": {
+      "system": "You are an expert estate planning advisor with 20 years of experience. Your role is to analyze client profiles and recommend appropriate legal instruments for their estate plan. You must respond ONLY with valid JSON — no markdown code blocks, no preamble, no explanation outside the JSON. Your response must be a single valid JSON object.",
+      "user": "Analyze this client and recommend estate planning instruments.\n\nCLIENT PROFILE:\n- Name: Margaret Chen\n- Age: 72 years old\n- Marital Status: Married\n- Has Dependent Children: true\n- Owns Real Property: true\n- Owns a Business: true\n\nAVAILABLE INSTRUMENTS (select all that apply):\n- Last Will and Testament\n- Revocable Living Trust\n- Irrevocable Trust\n- Healthcare Directive (Living Will)\n- Durable Power of Attorney (Healthcare)\n- Financial Power of Attorney\n- Beneficiary Designations Review\n- Business Succession Plan\n- Guardianship Designation\n- Pour-Over Will\n\nURGENCY GUIDELINES:\n- High: Client is age 65+, OR owns a business alongside other assets, OR has minor children with significant assets\n- Medium: Client has 2+ complicating factors (e.g., divorced + children, or married + property without other planning)\n- Low: Client is young (under 40), single, no dependents, minimal assets\n\nRespond with exactly this JSON (no other text):\n{\n  \"client_name\": \"Margaret Chen\",\n  \"recommended_instruments\": [\"instrument1\", \"instrument2\"],\n  \"rationale\": \"1-3 sentences explaining the specific recommendation for this client\",\n  \"urgency_flag\": \"High or Medium or Low\"\n}"
+    },
+    "raw_llm_response": "{\n  \"client_name\": \"Margaret Chen\",\n  \"recommended_instruments\": [\"Last Will and Testament\", \"Revocable Living Trust\", \"Durable Power of Attorney (Healthcare)\", \"Financial Power of Attorney\", \"Business Succession Plan\", \"Guardianship Designation\", \"Beneficiary Designations Review\"],\n  \"rationale\": \"Given Margaret's age, marital status, dependent children, real property, and business ownership, a comprehensive estate plan is necessary to ensure the distribution of her assets and the well-being of her dependents. A Revocable Living Trust will help avoid probate, while a Last Will and Testament and Pour-Over Will can provide a backup plan for any assets not included in the trust. The additional instruments will provide for healthcare and financial decision-making, business succession, and guardianship of her children.\",\n  \"urgency_flag\": \"High\"\n}",
+    "parsed_output": {
+      "client_name": "Margaret Chen",
+      "recommended_instruments": [
+        "Last Will and Testament",
+        "Revocable Living Trust",
+        "Durable Power of Attorney (Healthcare)",
+        "Financial Power of Attorney",
+        "Business Succession Plan",
+        "Guardianship Designation",
+        "Beneficiary Designations Review"
+      ],
+      "rationale": "Given Margaret's age, marital status, dependent children, real property, and business ownership, a comprehensive estate plan is necessary to ensure the distribution of her assets and the well-being of her dependents. A Revocable Living Trust will help avoid probate, while a Last Will and Testament and Pour-Over Will can provide a backup plan for any assets not included in the trust. The additional instruments will provide for healthcare and financial decision-making, business succession, and guardianship of her children.",
+      "urgency_flag": "High"
+    }
+  },
+  {
+    "input_data": {
+      "name": "Robert Davis",
+      "age": 45,
+      "marital_status": "Divorced",
+      "has_children": true,
+      "owns_property": true,
+      "has_business": false
+    },
+    "prompt_sent": {
+      "system": "You are an expert estate planning advisor with 20 years of experience. Your role is to analyze client profiles and recommend appropriate legal instruments for their estate plan. You must respond ONLY with valid JSON — no markdown code blocks, no preamble, no explanation outside the JSON. Your response must be a single valid JSON object.",
+      "user": "Analyze this client and recommend estate planning instruments.\n\nCLIENT PROFILE:\n- Name: Robert Davis\n- Age: 45 years old\n- Marital Status: Divorced\n- Has Dependent Children: true\n- Owns Real Property: true\n- Owns a Business: false\n\nAVAILABLE INSTRUMENTS (select all that apply):\n- Last Will and Testament\n- Revocable Living Trust\n- Irrevocable Trust\n- Healthcare Directive (Living Will)\n- Durable Power of Attorney (Healthcare)\n- Financial Power of Attorney\n- Beneficiary Designations Review\n- Business Succession Plan\n- Guardianship Designation\n- Pour-Over Will\n\nURGENCY GUIDELINES:\n- High: Client is age 65+, OR owns a business alongside other assets, OR has minor children with significant assets\n- Medium: Client has 2+ complicating factors (e.g., divorced + children, or married + property without other planning)\n- Low: Client is young (under 40), single, no dependents, minimal assets\n\nRespond with exactly this JSON (no other text):\n{\n  \"client_name\": \"Robert Davis\",\n  \"recommended_instruments\": [\"instrument1\", \"instrument2\"],\n  \"rationale\": \"1-3 sentences explaining the specific recommendation for this client\",\n  \"urgency_flag\": \"High or Medium or Low\"\n}"
+    },
+    "raw_llm_response": "{\n  \"client_name\": \"Robert Davis\",\n  \"recommended_instruments\": [\"Last Will and Testament\", \"Revocable Living Trust\", \"Guardianship Designation\", \"Durable Power of Attorney (Healthcare)\", \"Financial Power of Attorney\", \"Healthcare Directive (Living Will)\", \"Beneficiary Designations Review\"],\n  \"rationale\": \"Given Robert Davis's status as a divorced individual with dependent children and ownership of real property, a comprehensive estate plan is necessary to ensure the well-being of his children and the distribution of his assets according to his wishes. A Revocable Living Trust will help manage his real property, while a Last Will and Testament and Guardianship Designation will provide for his children. Additional instruments such as Durable Power of Attorney, Financial Power of Attorney, Healthcare Directive, and Beneficiary Designations Review will provide a complete protection of his interests.\",\n  \"urgency_flag\": \"Medium\"\n}",
+    "parsed_output": {
+      "client_name": "Robert Davis",
+      "recommended_instruments": [
+        "Last Will and Testament",
+        "Revocable Living Trust",
+        "Guardianship Designation",
+        "Durable Power of Attorney (Healthcare)",
+        "Financial Power of Attorney",
+        "Healthcare Directive (Living Will)",
+        "Beneficiary Designations Review"
+      ],
+      "rationale": "Given Robert Davis's status as a divorced individual with dependent children and ownership of real property, a comprehensive estate plan is necessary to ensure the well-being of his children and the distribution of his assets according to his wishes. A Revocable Living Trust will help manage his real property, while a Last Will and Testament and Guardianship Designation will provide for his children. Additional instruments such as Durable Power of Attorney, Financial Power of Attorney, Healthcare Directive, and Beneficiary Designations Review will provide a complete protection of his interests.",
+      "urgency_flag": "Medium"
+    }
+  },
+  {
+    "input_data": {
+      "name": "Sarah Kim",
+      "age": 28,
+      "marital_status": "Single",
+      "has_children": false,
+      "owns_property": false,
+      "has_business": false
+    },
+    "prompt_sent": {
+      "system": "You are an expert estate planning advisor with 20 years of experience. Your role is to analyze client profiles and recommend appropriate legal instruments for their estate plan. You must respond ONLY with valid JSON — no markdown code blocks, no preamble, no explanation outside the JSON. Your response must be a single valid JSON object.",
+      "user": "Analyze this client and recommend estate planning instruments.\n\nCLIENT PROFILE:\n- Name: Sarah Kim\n- Age: 28 years old\n- Marital Status: Single\n- Has Dependent Children: false\n- Owns Real Property: false\n- Owns a Business: false\n\nAVAILABLE INSTRUMENTS (select all that apply):\n- Last Will and Testament\n- Revocable Living Trust\n- Irrevocable Trust\n- Healthcare Directive (Living Will)\n- Durable Power of Attorney (Healthcare)\n- Financial Power of Attorney\n- Beneficiary Designations Review\n- Business Succession Plan\n- Guardianship Designation\n- Pour-Over Will\n\nURGENCY GUIDELINES:\n- High: Client is age 65+, OR owns a business alongside other assets, OR has minor children with significant assets\n- Medium: Client has 2+ complicating factors (e.g., divorced + children, or married + property without other planning)\n- Low: Client is young (under 40), single, no dependents, minimal assets\n\nRespond with exactly this JSON (no other text):\n{\n  \"client_name\": \"Sarah Kim\",\n  \"recommended_instruments\": [\"instrument1\", \"instrument2\"],\n  \"rationale\": \"1-3 sentences explaining the specific recommendation for this client\",\n  \"urgency_flag\": \"High or Medium or Low\"\n}"
+    },
+    "raw_llm_response": "{\n  \"client_name\": \"Sarah Kim\",\n  \"recommended_instruments\": [\"Last Will and Testament\", \"Healthcare Directive (Living Will)\", \"Durable Power of Attorney (Healthcare)\", \"Financial Power of Attorney\", \"Beneficiary Designations Review\"],\n  \"rationale\": \"Given Sarah Kim's young age, single status, and lack of dependents or significant assets, a basic estate plan is recommended to ensure her wishes are respected in case of incapacitation or unexpected death. The selected instruments provide a foundation for her estate plan, allowing her to designate decision-makers and beneficiaries. As her situation is relatively straightforward, these instruments should suffice for now.\",\n  \"urgency_flag\": \"Low\"\n}",
+    "parsed_output": {
+      "client_name": "Sarah Kim",
+      "recommended_instruments": [
+        "Last Will and Testament",
+        "Healthcare Directive (Living Will)",
+        "Durable Power of Attorney (Healthcare)",
+        "Financial Power of Attorney",
+        "Beneficiary Designations Review"
+      ],
+      "rationale": "Given Sarah Kim's young age, single status, and lack of dependents or significant assets, a basic estate plan is recommended to ensure her wishes are respected in case of incapacitation or unexpected death. The selected instruments provide a foundation for her estate plan, allowing her to designate decision-makers and beneficiaries. As her situation is relatively straightforward, these instruments should suffice for now.",
+      "urgency_flag": "Low"
+    }
+  }
+]

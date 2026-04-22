@@ -1,0 +1,529 @@
+{
+  "name": "Task 1: Estate Planning AI Intake Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Estate Planning Client Intake",
+        "formDescription": "Manual mode: fill the client fields below. Batch mode: select File Format and upload a CSV, JSON, or XLSX file. Leave file fields empty for manual entry.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "fieldName": "name"
+            },
+            {
+              "fieldLabel": "Age",
+              "fieldType": "number",
+              "fieldName": "age"
+            },
+            {
+              "fieldLabel": "Marital Status",
+              "fieldType": "dropdown",
+              "fieldName": "marital_status",
+              "fieldOptions": {
+                "values": [
+                  {},
+                  {
+                    "option": "Single"
+                  },
+                  {
+                    "option": "Married"
+                  },
+                  {
+                    "option": "Divorced"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Has Dependent Children",
+              "fieldType": "dropdown",
+              "fieldName": "has_children",
+              "fieldOptions": {
+                "values": [
+                  {},
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Owns Real Property",
+              "fieldType": "dropdown",
+              "fieldName": "owns_property",
+              "fieldOptions": {
+                "values": [
+                  {},
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Owns a Business",
+              "fieldType": "dropdown",
+              "fieldName": "has_business",
+              "fieldOptions": {
+                "values": [
+                  {},
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "File Format (batch only)",
+              "fieldType": "dropdown",
+              "fieldName": "file_format",
+              "fieldOptions": {
+                "values": [
+                  {},
+                  {
+                    "option": "CSV"
+                  },
+                  {
+                    "option": "JSON"
+                  },
+                  {
+                    "option": "XLSX"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Upload Client File",
+              "fieldType": "file",
+              "fieldName": "client_file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".csv,.json,.xlsx,.xls"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-01-form-trigger",
+      "name": "Client Intake Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        256,
+        304
+      ],
+      "webhookId": "6f793a74-a263-433b-a94f-2d8bfd6f32e9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cond-file-check",
+              "leftValue": "={{ $json.file_format }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-02-if-file",
+      "name": "File Uploaded?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "={{ $json.file_format === 'CSV' ? 0 : $json.file_format === 'JSON' ? 1 : 2 }}"
+      },
+      "id": "node-03-switch",
+      "name": "Detect File Format",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "client_file",
+        "options": {
+          "headerRow": true
+        }
+      },
+      "id": "node-04a-csv",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "client_file",
+        "options": {}
+      },
+      "id": "node-04b-json",
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "client_file",
+        "options": {
+          "headerRow": true
+        }
+      },
+      "id": "node-04c-xlsx",
+      "name": "Parse XLSX",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const toBool = v => ['true','yes','1',true,1].includes(typeof v === 'string' ? v.toLowerCase().trim() : v);\nconst normalise = r => ({ json: {\n  name: String(r.name || r.Name || '').trim(),\n  age: parseInt(r.age || r.Age, 10),\n  marital_status: String(r.marital_status || r.Marital_Status || r['Marital Status'] || '').trim(),\n  has_children: toBool(r.has_children ?? r.Has_Children ?? r['Has Children']),\n  owns_property: toBool(r.owns_property ?? r.Owns_Property ?? r['Owns Property']),\n  has_business: toBool(r.has_business ?? r.Has_Business ?? r['Has Business'])\n}});\nconst results = [];\nfor (const item of $input.all()) {\n  const r = item.json;\n  if (r.data && Array.isArray(r.data)) { results.push(...r.data.map(normalise)); }\n  else { results.push(normalise(r)); }\n}\nreturn results;"
+      },
+      "id": "node-05-normalise",
+      "name": "Normalise File Records",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $input.first().json;\nconst toBool = v => v === 'Yes' || v === true || v === 'true' || v === '1';\nreturn [{ json: {\n  name: String(f.name || '').trim(),\n  age: parseInt(f.age, 10) || 0,\n  marital_status: String(f.marital_status || '').trim(),\n  has_children: toBool(f.has_children),\n  owns_property: toBool(f.owns_property),\n  has_business: toBool(f.has_business)\n}}];"
+      },
+      "id": "node-06-wrap",
+      "name": "Wrap Form Fields as Client",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const client = item.json;\n\n  const systemPrompt = `You are an expert estate planning advisor with 20 years of experience. Your role is to analyze client profiles and recommend appropriate legal instruments for their estate plan. You must respond ONLY with valid JSON — no markdown code blocks, no preamble, no explanation outside the JSON. Your response must be a single valid JSON object.`;\n\n  const userPrompt = `Analyze this client and recommend estate planning instruments.\n\nCLIENT PROFILE:\n- Name: ${client.name}\n- Age: ${client.age} years old\n- Marital Status: ${client.marital_status}\n- Has Dependent Children: ${client.has_children}\n- Owns Real Property: ${client.owns_property}\n- Owns a Business: ${client.has_business}\n\nAVAILABLE INSTRUMENTS (select all that apply):\n- Last Will and Testament\n- Revocable Living Trust\n- Irrevocable Trust\n- Healthcare Directive (Living Will)\n- Durable Power of Attorney (Healthcare)\n- Financial Power of Attorney\n- Beneficiary Designations Review\n- Business Succession Plan\n- Guardianship Designation\n- Pour-Over Will\n\nURGENCY GUIDELINES:\n- High: Client is age 65+, OR owns a business alongside other assets, OR has minor children with significant assets\n- Medium: Client has 2+ complicating factors (e.g., divorced + children, or married + property without other planning)\n- Low: Client is young (under 40), single, no dependents, minimal assets\n\nRespond with exactly this JSON (no other text):\n{\n  \"client_name\": \"${client.name}\",\n  \"recommended_instruments\": [\"instrument1\", \"instrument2\"],\n  \"rationale\": \"1-3 sentences explaining the specific recommendation for this client\",\n  \"urgency_flag\": \"High or Medium or Low\"\n}`;\n\n  const groq_body = {\n    model: 'llama-3.3-70b-versatile',\n    temperature: 0.1,\n    max_tokens: 500,\n    messages: [\n      { role: 'system', content: systemPrompt },\n      { role: 'user', content: userPrompt }\n    ]\n  };\n\n  return { json: { ...client, system_prompt: systemPrompt, user_prompt: userPrompt, groq_body } };\n});"
+      },
+      "id": "node-07-prompt",
+      "name": "Build LLM Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.groq_body }}",
+        "options": {}
+      },
+      "id": "node-08-groq",
+      "name": "Call Groq API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1760,
+        304
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "groqApi": {
+          "id": "adKWl8VIEAtOymTK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item, i) => {\n  const data = item.json;\n  const promptData = $('Build LLM Prompt').all()[i]?.json || {};\n\n  const rawResponse = data.choices[0].message.content;\n  let parsed;\n\n  try {\n    parsed = JSON.parse(rawResponse);\n  } catch (e) {\n    const match = rawResponse.match(/\\{[\\s\\S]*\\}/);\n    if (match) {\n      parsed = JSON.parse(match[0]);\n    } else {\n      throw new Error(`Cannot parse LLM response: ${rawResponse}`);\n    }\n  }\n\n  const required = ['client_name', 'recommended_instruments', 'rationale', 'urgency_flag'];\n  for (const field of required) {\n    if (!parsed[field]) throw new Error(`Missing field \"${field}\" in LLM response for item ${i}`);\n  }\n\n  if (!['High', 'Medium', 'Low'].includes(parsed.urgency_flag)) {\n    throw new Error(`Invalid urgency_flag \"${parsed.urgency_flag}\" — expected High / Medium / Low`);\n  }\n\n  return {\n    json: {\n      client_name: parsed.client_name,\n      recommended_instruments: parsed.recommended_instruments,\n      rationale: parsed.rationale,\n      urgency_flag: parsed.urgency_flag,\n      _input: {\n        name: promptData.name,\n        age: promptData.age,\n        marital_status: promptData.marital_status,\n        has_children: promptData.has_children,\n        owns_property: promptData.owns_property,\n        has_business: promptData.has_business\n      },\n      _system_prompt: promptData.system_prompt,\n      _user_prompt: promptData.user_prompt,\n      _raw_response: rawResponse\n    }\n  };\n});"
+      },
+      "id": "node-09-parse",
+      "name": "Parse and Validate LLM Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "clients",
+        "options": {}
+      },
+      "id": "node-10-aggregate",
+      "name": "Collect All Results",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allClients = $input.first().json.clients;\n\nconst sampleOutput = allClients.map(c => ({\n  client_name: c.client_name,\n  recommended_instruments: c.recommended_instruments,\n  rationale: c.rationale,\n  urgency_flag: c.urgency_flag\n}));\n\nconst evidenceData = allClients.map(c => ({\n  input_data: c._input,\n  prompt_sent: { system: c._system_prompt, user: c._user_prompt },\n  raw_llm_response: c._raw_response,\n  parsed_output: {\n    client_name: c.client_name,\n    recommended_instruments: c.recommended_instruments,\n    rationale: c.rationale,\n    urgency_flag: c.urgency_flag\n  }\n}));\n\nreturn [{ json: { sample_output: sampleOutput, evidence_data: evidenceData } }];"
+      },
+      "id": "node-11-format",
+      "name": "Format Final Outputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2512,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Triage Complete",
+        "completionMessage": "={{ $('Format Final Outputs').first().json.sample_output.map(c => `<div style=\"border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:18px;border-left:5px solid ${c.urgency_flag==='High'?'#e53e3e':c.urgency_flag==='Medium'?'#dd6b20':'#38a169'}\"><p style=\"font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 8px\">${c.client_name}</p><div style=\"margin-bottom:16px\"><span style=\"font-size:11px;font-weight:600;text-transform:uppercase;color:#888;margin-right:8px\">Urgency:</span><span style=\"padding:3px 14px;border-radius:20px;font-size:12px;font-weight:600;background:${c.urgency_flag==='High'?'#fed7d7':c.urgency_flag==='Medium'?'#feebc8':'#c6f6d5'};color:${c.urgency_flag==='High'?'#c53030':c.urgency_flag==='Medium'?'#c05621':'#276749'}\">${c.urgency_flag}</span></div><p style=\"font-size:11px;font-weight:600;text-transform:uppercase;color:#888;margin:0 0 8px\">Recommended Instruments</p><ol style=\"margin:0 0 14px;padding-left:20px\">${c.recommended_instruments.map((inst,idx)=>`<li style=\"padding:5px 0;font-size:14px;color:#1a1a2e;border-bottom:1px solid #f0f0f0\"><span style=\"font-weight:600;color:#4338ca;margin-right:6px\">#${idx+1}</span>${inst}</li>`).join('')}</ol><p style=\"font-size:11px;font-weight:600;text-transform:uppercase;color:#888;margin:0 0 6px\">Rationale</p><p style=\"color:#444;font-size:14px;line-height:1.6;margin:0\">${c.rationale}</p></div>`).join('') }}",
+        "options": {}
+      },
+      "id": "node-12-form-ending",
+      "name": "Show Results Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        2752,
+        304
+      ],
+      "webhookId": "6c4592bd-652d-4510-bc36-7edb4cbfe126"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Client Intake Form": {
+      "main": [
+        [
+          {
+            "node": "File Uploaded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Uploaded?": {
+      "main": [
+        [
+          {
+            "node": "Detect File Format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wrap Form Fields as Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect File Format": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse XLSX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Normalise File Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON": {
+      "main": [
+        [
+          {
+            "node": "Normalise File Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse XLSX": {
+      "main": [
+        [
+          {
+            "node": "Normalise File Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise File Records": {
+      "main": [
+        [
+          {
+            "node": "Build LLM Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wrap Form Fields as Client": {
+      "main": [
+        [
+          {
+            "node": "Build LLM Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build LLM Prompt": {
+      "main": [
+        [
+          {
+            "node": "Call Groq API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Groq API": {
+      "main": [
+        [
+          {
+            "node": "Parse and Validate LLM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse and Validate LLM Response": {
+      "main": [
+        [
+          {
+            "node": "Collect All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect All Results": {
+      "main": [
+        [
+          {
+            "node": "Format Final Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Outputs": {
+      "main": [
+        [
+          {
+            "node": "Show Results Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "71f5a272-9cfb-4051-bb33-1cabdb0f86db",
+  "meta": {
+    "instanceId": "52ff68ba925f4ff734dfb6b1334c1378acfa7aa54fb7009524f2b02f12cbf725"
+  },
+  "id": "8ZE9CW3WJ6sQlbt7",
+  "tags": []
+}

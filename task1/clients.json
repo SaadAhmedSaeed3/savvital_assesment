@@ -1,0 +1,5 @@
+[
+  {"name":"Margaret Chen","age":72,"marital_status":"Married","has_children":true,"owns_property":true,"has_business":true},
+  {"name":"Robert Davis","age":45,"marital_status":"Divorced","has_children":true,"owns_property":true,"has_business":false},
+  {"name":"Sarah Kim","age":28,"marital_status":"Single","has_children":false,"owns_property":false,"has_business":false}
+]
